@@ -57,6 +57,7 @@ func main() {
 		AllowCredentials: true,
 		AllowedHeaders:   []string{"Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "Accept", "Origin", "Cache-Control", "X-Requested-With"},
 	})
+	startReminderScheduler(db, app.fcmHandler)
 
 	srv := &http.Server{
 		Addr:         *addr,

@@ -18,6 +18,14 @@ func (app *application) routes() http.Handler {
 	// Swagger docs
 	mux.Get("/swagger/", httpSwagger.WrapHandler)
 
+	// USER
+	mux.Post("/api/users", http.HandlerFunc(app.userHandler.Create))
+	mux.Get("/api/users", http.HandlerFunc(app.userHandler.GetAll))
+	mux.Get("/api/users/:id", http.HandlerFunc(app.userHandler.GetByID))
+	mux.Put("/api/users", http.HandlerFunc(app.userHandler.Update))
+	mux.Del("/api/users/:id", http.HandlerFunc(app.userHandler.Delete))
+	mux.Post("/api/login", http.HandlerFunc(app.userHandler.LoginUser))
+
 	// MICROGREEN
 	mux.Post("/api/microgreens", http.HandlerFunc(app.microgreenHandler.Create))
 	mux.Get("/api/microgreens", http.HandlerFunc(app.microgreenHandler.GetAll))
@@ -45,6 +53,7 @@ func (app *application) routes() http.Handler {
 	mux.Get("/api/photos/:id", http.HandlerFunc(app.photoHandler.GetByID))
 	mux.Put("/api/photos", http.HandlerFunc(app.photoHandler.Update))
 	mux.Del("/api/photos/:id", http.HandlerFunc(app.photoHandler.Delete))
+	mux.Get("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))
 
 	// ADVICE
 	mux.Post("/api/advice", http.HandlerFunc(app.adviceHandler.Create))
@@ -60,6 +69,27 @@ func (app *application) routes() http.Handler {
 	mux.Del("/notify/token/:id", http.HandlerFunc(app.fcmHandler.DeleteToken))
 	mux.Post("/notify/history", http.HandlerFunc(app.fcmHandler.ShowNotifyHistory))
 	mux.Del("/notify/history/:id", http.HandlerFunc(app.fcmHandler.DeleteNotifyHistory))
+
+	// WEBSOCKET
+	// @Tags WebSocket
+	// @Description Подключение WebSocket для реального времени по пути /ws
+	mux.Get("/ws", http.HandlerFunc(app.WebSocketHandler))
+
+	// @Tags WebSocket
+	// @Description Подключение WebSocket чата с AI по пути /ws/ai
+	mux.Get("/ws/ai", http.HandlerFunc(app.WebSocketAIHandler))
+
+	// REMINDERS
+	mux.Post("/api/reminders", http.HandlerFunc(app.reminderHandler.CreateReminder))
+	mux.Del("/api/reminders/:id", http.HandlerFunc(app.reminderHandler.DeleteReminder))
+	mux.Get("/api/reminders/user/:userId", http.HandlerFunc(app.reminderHandler.GetRemindersByUser))
+
+	//
+	mux.Get("/api/analytics/batch-progress", http.HandlerFunc(app.analyticsHandler.GetBatchProgress))
+	mux.Get("/api/analytics/humidity-last-7-days", http.HandlerFunc(app.analyticsHandler.GetHumidityLast7Days))
+	mux.Get("/api/analytics/height-last-7-days", http.HandlerFunc(app.analyticsHandler.GetHeightLast7Days))
+	mux.Get("/api/analytics/ai-prediction", http.HandlerFunc(app.analyticsHandler.GetAIPrediction))
+	mux.Get("/api/analytics/today-observations", http.HandlerFunc(app.analyticsHandler.GetTodayObservations))
 
 	return standardMiddleware.Then(mux)
 }

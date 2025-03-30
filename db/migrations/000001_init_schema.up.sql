@@ -96,3 +96,23 @@ CREATE TABLE advice_messages
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (microgreen_id) REFERENCES microgreens (id)
 );
+
+CREATE TABLE messages
+(
+    id          SERIAL PRIMARY KEY,
+    sender_id   INTEGER   NOT NULL REFERENCES users (id),
+    receiver_id INTEGER   NOT NULL REFERENCES users (id),
+    text        TEXT      NOT NULL,
+    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE reminders
+(
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    user_id    INT  NOT NULL,
+    message    TEXT NOT NULL,
+    time       TIME NOT NULL,
+    active     BOOLEAN  DEFAULT TRUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);

@@ -11,25 +11,34 @@ import (
 	"google.golang.org/api/option"
 	"log"
 	"net/http"
+	"os"
 )
 
 type application struct {
+	db                 *sql.DB
 	errorLog           *log.Logger
 	infoLog            *log.Logger
+	wsManager          *WebSocketManager
 	microgreenHandler  *handlers.MicrogreenHandler
 	fcmHandler         *handlers.FCMHandler
 	batchHandler       *handlers.BatchHandler
 	observationHandler *handlers.ObservationHandler
 	photoHandler       *handlers.PhotoHandler
 	adviceHandler      *handlers.AdviceHandler
+	userHandler        *handlers.UserHandler
+	reminderHandler    *handlers.ReminderHandler
+	analyticsHandler   *handlers.AnalyticsHandler
 }
 
 func initializeApp(db *sql.DB, errorLog, infoLog *log.Logger) *application {
 
 	ctx := context.Background()
 	sa := option.WithCredentialsFile("C:\\Users\\alimz\\GolandProjects\\MicroGreens\\cmd\\web\\serviceAccountKey.json")
+	if _, err := os.Stat("C:\\Users\\alimz\\GolandProjects\\MicroGreens\\cmd\\web\\serviceAccountKey.json"); err != nil {
+		log.Fatalf("serviceAccountKey.json not found: %v", err)
+	}
 
-	firebaseApp, err := firebase.NewApp(ctx, &firebase.Config{ProjectID: "jedel-komek"}, sa)
+	firebaseApp, err := firebase.NewApp(ctx, &firebase.Config{ProjectID: "greending-470ce"}, sa)
 	if err != nil {
 		errorLog.Fatalf("Ошибка в нахождении приложения: %v\n", err)
 	}
@@ -40,6 +49,10 @@ func initializeApp(db *sql.DB, errorLog, infoLog *log.Logger) *application {
 	}
 
 	fcmHandler := handlers.NewFCMHandler(fcmClient, db)
+
+	userRepo := &repositories.UserRepository{Db: db}
+	userService := &services.UserService{Repo: userRepo}
+	userHandler := &handlers.UserHandler{Service: userService}
 
 	microgreenRepo := &repositories.MicrogreenRepository{Db: db}
 	microgreenService := &services.MicrogreenService{Repo: microgreenRepo}
@@ -61,15 +74,24 @@ func initializeApp(db *sql.DB, errorLog, infoLog *log.Logger) *application {
 	adviceService := &services.AdviceService{Repo: adviceRepo}
 	adviceHandler := &handlers.AdviceHandler{Service: adviceService}
 
+	reminderHandler := handlers.NewReminderHandler(db)
+
+	analyticsHandler := handlers.NewAnalyticsHandler(db)
+
 	return &application{
+		db:                 db,
 		errorLog:           errorLog,
 		infoLog:            infoLog,
+		wsManager:          NewWebSocketManager(),
 		fcmHandler:         fcmHandler,
 		microgreenHandler:  microgreenHandler,
 		batchHandler:       batchHandler,
 		observationHandler: observationHandler,
 		photoHandler:       photoHandler,
 		adviceHandler:      adviceHandler,
+		userHandler:        userHandler,
+		reminderHandler:    reminderHandler,
+		analyticsHandler:   analyticsHandler,
 	}
 }
 
