@@ -1,0 +1,14 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Backend для проекта \"JedelKomek\": работа с пользователями, инцидентами, уведомлениями и экстренными вызовами",
+        "title": "JedelKomek API",
+        "contact": {
+            "name": "Dev Support"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:4000",
+    "basePath": "/",
+    "paths": {}
+}

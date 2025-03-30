@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS education_contents;
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS chat_messages;
+DROP TABLE IF EXISTS emergency_calls;
+DROP TABLE IF EXISTS incident_reports;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS news;
+DROP TABLE IF EXISTS police_department;
+DROP TABLE IF EXISTS direct_messages;
+DROP TABLE IF EXISTS incident_types;
